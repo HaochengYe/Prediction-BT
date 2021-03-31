@@ -1,12 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-from datetime import datetime
 import statsmodels.api as sm
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.cross_decomposition import PLSRegression
-from multiprocessing import Pool, Process
+from multiprocessing import Process
 
 from Strategy import *
 
@@ -20,7 +18,6 @@ def Granger_Causality_Pred(num):
 
     # set up global variables
     leader_tick_dict = {}
-    leader_t_val = {}
     perf_res = {}
     w_mktre = (1 + pct_df['SPY_Close']).resample('W').prod() - 1
 
@@ -33,7 +30,6 @@ def Granger_Causality_Pred(num):
         w_target = (1 + target_arr).resample('W').prod() - 1
         Y = w_target.shift(-1)
         leader_set = []
-        leader_tval = []
 
         for leader in pct_df.columns[::3]:
             if leader != tick:
@@ -60,14 +56,11 @@ def Granger_Causality_Pred(num):
 
                 if leader_sig <= 1e-3:
                     leader_set.append(leader)
-                    leader_tval.append(abs(res.tvalues[3]))
 
         leader_tick_dict[tick] = leader_set
-        leader_t_val[tick] = leader_tval
 
         # evaluate performance
         leader = leader_tick_dict[tick]
-        t_val = leader_t_val[tick]
         if len(leader) > 1:
             # simple average
             avg_signal = ((1 + pct_df[leader_tick_dict[tick]]).resample('W').prod() - 1).mean(axis=1)
@@ -102,6 +95,7 @@ def Granger_Causality_Pred(num):
                     anvol = AnnVol(leader_arr[col], 5, t)
                     phl = Price_High_Low(leader_arr[col], 5, t)
                     prev = PriceReverse(leader_arr[col], 5, t)
+                    # rsi = RelativeStrengh(leader_arr[col], 5, t)
 
                     ind_arr.append([macd, booling, volcof, anvol, phl, prev])
 

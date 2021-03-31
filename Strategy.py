@@ -91,6 +91,24 @@ def Price_High_Low(df, cycle, time):
         pass
 
 
+def RelativeStrengh(df, cycle, time):
+    """
+    Compute relative strength index
+    Order: Descending
+    :param df: dataframe object (n*1 vector)
+    :param cycle: how many days to look back to see its reversal
+    :param time: current index for df to look at
+    :return: RSI_{i,t} = 100 - (100 / (1 + avg. gain / avg. loss))
+    """
+    try:
+        arr = df.iloc[time - cycle:time].values
+        pct_arr = np.diff(arr) / arr[:len(arr)-1]
+        gain = pct_arr[pct_arr > 0].mean()
+        loss = pct_arr[pct_arr < 0].mean()
+        return 100 - (100 / (1 + gain / loss))
+    except KeyError:
+        pass
+
 def Vol_Coefficient(df, cycle, time):
     """
     Compute Coefficient of Variation:

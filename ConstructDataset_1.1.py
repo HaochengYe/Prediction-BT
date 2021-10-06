@@ -59,7 +59,7 @@ def data_preprocess(dta):
     for tick in dta.columns:
         dta[tick] = dta[tick].mask(dta[tick] == 0).ffill(downcast='infer')
 
-    return dta[dta.index >= dta['SPY_Close'].first_valid_index()]
+    return dta
 
 
 if __name__ == '__main__':
